@@ -106,24 +106,33 @@ https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/10.png)
 12. Ejecutar el programa de mrjob en Hadoop utilizando los siguientes pasos:
 
-* Agregar un archivo llamado .mrjob.conf con la siguiente información:
-	```yaml
-		runners:
-		  emr:
-		    aws_access_key_id: YOUR_ACCESS_KEY
-		    aws_secret_access_key: YOUR_SECRET_KEY
-		    region: YOUR_REGION
+* Crear la carpeta en hadoop donde se almacenaran los datasets
+	```bash
+	hdfs dfs -mkdir /user/hadoop/datasets/
 	```
-* Instalar la biblioteca `boto3` ejecutando el siguiente comando:
-	```yaml
-    pip3 install boto3
+	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/25.png)
+* Nos movemos a la ruta donde estan los datasets y copiamos los datos en hadoop:
+	```bash
+	cd st0263-2023-1/
+	hdfs dfs -copyFromLocal ./datasets/* /user/hadoop/datasets/
 	```
-* Subir los archivos necesarios a tu bucket de S3.
-	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/11.png)
+	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/26.png)
 * Ejecutar el siguiente comando para lanzar el trabajo en EMR:
 	```bash
-	python wordcount-mr.py -r emr s3://bucket.reto5/inputs/datasets/gutenberg-small/*.txt --output-dir=s3://bucket.reto5/outputs/ -D mapred.reduce.tasks=10
+	python wordcount-mr.py hdfs:///user/hadoop/datasets/gutenberg-small/*.txt -r hadoop --output-dir hdfs:///user/hadoop/results --hadoop-streaming-jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar
 	```
+	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/27.png)
+	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/28.png)
+* Confirmamos la salida del archivo:
+	```bash
+	hdfs dfs -ls /user/hadoop/results
+	```
+	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/29.png)
+	```bash
+	hdfs dfs -cat /user/hadoop/results/part-00000
+	```
+	![enter image description here](https://raw.githubusercontent.com/juan9572/TET_Reto_N5/main/Static/30.png)
+
 13. Para el Reto 1, descargar el repositorio y ejecutar los siguientes programas y comandos:
 * Salario promedio por Sector Económico (SE):
 	```bash
